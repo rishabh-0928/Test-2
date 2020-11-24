@@ -1,0 +1,26 @@
+[
+    {
+        "id": 1,
+        "title": "The Da Vinci Code",
+        "author": "Dan Brown",
+        "publisher": "Doubleday",
+        "year": "2003",
+        "isbn": "0-385-50420-9"
+    },
+    {
+        "id": 2,
+        "title": "Harry Potter and the Philosopher's Stone",
+        "author": "J. K. Rowling",
+        "publisher": "Bloomsbury",
+        "year": "1997",
+        "isbn": "0-7475-3269-9"
+    },
+    {
+        "id": 3,
+        "title": "Life of Pi",
+        "author": "Yann Martel",
+        "publisher": "Knopf Canada",
+        "year": "2001",
+        "isbn": "0-676-97376-0"
+    }
+]
