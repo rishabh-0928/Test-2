@@ -12,6 +12,17 @@ router.get('/books', function (req, res) {
     })
 });
 
+router.get('/books-by-year/:year', function (req, res) {
+    var year = req.params.year;
+    var data = fs.readFileSync('./src/files/data.json', 'utf-8');
+    var books = JSON.parse(data);
+    var filteredBooks = books.filter(function (book) {
+        if (year == 'ALL') return true;
+        else return book.year == year;
+    });
+    res.json({status: 'success', books: filteredBooks});
+});
+
 router.post('/book', function(req, res) {
     var title = req.body.title,
         author = req.body.author,
@@ -42,17 +53,50 @@ router.post('/book', function(req, res) {
 
     data.push(bookData);
 
-    fs.writeFile('./src/files/data.json', JSON.stringify(data, null, 4), function (err) {
-        if (err) {
-            res.json({status: 'failed', msg: 'the book was not saved'});
-        } else {
-            res.redirect('/browse-library.html');
-        }
-    });
+    fs.writeFileSync('./src/files/data.json', JSON.stringify(data, null, 4));
+    res.json({status: 'success', msg: 'The book is added successfully!'});
 });
 
-router.delete('/book', function(req, res) {
-    var id = parseInt(req.body.id);
+router.put('/book', function(req, res) {
+    var id = req.body.id,
+        title = req.body.title,
+        author = req.body.author,
+        publisher = req.body.publisher,
+        year = req.body.year,
+        isbn = req.body.isbn;
+
+    if (!title || !author || !publisher || !year || !isbn) {
+        res.status(400).json({status: 'failed', msg: 'title, author, publisher, year and isbn are required.'});
+        return;
+    }
+    
+    var dataText = fs.readFileSync('./src/files/data.json', 'utf-8');
+    var data = JSON.parse(dataText);
+    
+    // find book with id
+    var book = undefined;
+    for (var i = 0; i < data.length; ++i) {
+        if (data[i].id === parseInt(id)) {
+            book = data[i];
+            break;
+        }
+    }
+
+    if (book) {
+        book.title = title;
+        book.author = author;
+        book.publisher = publisher;
+        book.year = year
+        book.isbn = isbn;
+    }
+
+    fs.writeFileSync('./src/files/data.json', JSON.stringify(data, null, 4));
+
+    res.json({status: 'success', msg: 'The book is updated successfully!'});
+});
+
+router.delete('/book/:id', function(req, res) {
+    var id = parseInt(req.params.id);
 
     var dataText = fs.readFileSync('./src/files/data.json', 'utf-8');
     var data = JSON.parse(dataText);
@@ -61,13 +105,8 @@ router.delete('/book', function(req, res) {
         return book.id !== id;
     });
 
-    fs.writeFile('./src/files/data.json', JSON.stringify(data, null, 4), function (err) {
-        if (err) {
-            res.json({status: 'failed', msg: 'the book was not deleted'});
-        } else {
-            res.json({status: 'success', msg: 'the book was deleted'});
-        }
-    });
+    fs.writeFileSync('./src/files/data.json', JSON.stringify(data, null, 4));
+    res.json({status: 'success', msg: 'The book was deleted.'});
 });
 
 module.exports = router;
